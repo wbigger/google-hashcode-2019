@@ -1,6 +1,5 @@
 var fs = require('fs');
-var seedrandom = require('seedrandom');
-let rng = seedrandom('0');
+
 let totalScore = 0;
 
 function arrayUnique(array) {
@@ -14,7 +13,6 @@ function arrayUnique(array) {
 
     return a;
 }
-
 
 //let filenames = ["a_example"];
 
@@ -34,11 +32,11 @@ function computeInterest(slides) {
             return;
         }
         s2 = slide;
-        let i1 = s1.tags.filter(x => s2.tags.includes(x)).length; //intersect(s1.tags,s2.tags).length;
+        let i1 = s1.tags.filter(x => s2.tags.includes(x)).length; // intersezione
         //console.log(`interest 1: ${i1}`);
-        let i2 = s1.tags.filter(x => !s2.tags.includes(x)).length;
+        let i2 = s1.tags.filter(x => !s2.tags.includes(x)).length; // differenza
         //console.log(`interest 2: ${i2}`);
-        let i3 = s2.tags.filter(x => !s1.tags.includes(x)).length;
+        let i3 = s2.tags.filter(x => !s1.tags.includes(x)).length;  // differenza
         //console.log(`interest 3: ${i3}`);
         let min = Math.min(i1, i2, i3);
 
@@ -53,63 +51,78 @@ function computeInterest(slides) {
 
 filenames.forEach(filename => {
     console.log(filename);
-    let maxScore = 0;
-    let maxSlides = [];
-    [...Array(10).keys()].forEach(element => {
-        let contents = fs.readFileSync(`${filename}.txt`, 'ASCII');
-        let lines = contents.split('\n');
-        lines.shift(); // remove index
-        lines.pop(); // remove last empty line
-        lines = shuffle(lines);
-        //console.log(lines);
-        let slides = [];
-        let verticalBuffer = null;
-        lines.forEach((line, idx) => {
-            res = line.split(" ");
-            let slide = null;
-            if (res[0] == 'H') {
-                res.shift(); // remove H
-                res.shift(); // remove nTags
-                slide = {
-                    index: [idx],
-                    tags: res
-                };
-                //console.log(slide.tags);
-                slides.push(slide);
-            } else if (verticalBuffer == null) {
-                res.shift(); // remove V
-                res.shift(); // remove nTags
-                verticalBuffer = {
-                    index: idx,
-                    tags: res
-                };
-            } else {
-                res.shift(); // remove V
-                res.shift(); // remove nTags
-                let tags = arrayUnique(verticalBuffer.tags.concat(res));
-                //console.log(tags);
-                slide = {
-                    index: [idx, verticalBuffer.index],
-                    tags: tags
-                };
-                verticalBuffer = null;
-                slides.push(slide);
-            }
-        });
+    let contents = fs.readFileSync(`${filename}.txt`, 'ASCII');
+    let lines = contents.split('\n');
+    lines.shift(); // remove index
+    lines.pop(); // remove last empty line
+    //console.log(lines);
+    let slides = [];
+    let verticalBuffer = null;
 
-        let score = computeInterest(slides);
-        if (score > maxScore) {
-            maxSlides = slides.slice();
-            maxScore = score;
+    // vLines = lines.filter((x)=>{
+    //     return line.split(" ")[0] === 'V';
+    // }).sort((a,b)=>{
+
+    // });
+
+
+    // remove images with a single line
+    // lines = lines.filter((line) => {
+    //     return line.split(" ")[1] > 0;
+    // });
+
+
+    lines.forEach((line, idx) => {
+        res = line.split(" ");
+
+
+        let slide = null;
+        if (res[0] == 'H') {
+            res.shift(); // remove H
+            res.shift(); // remove nTags
+            slide = {
+                type: 'H',
+                index: [idx],
+                tags: res
+            };
+            //console.log(slide.tags);
+            slides.push(slide);
+        } else if (verticalBuffer == null) {
+            res.shift(); // remove V
+            res.shift(); // remove nTags
+            verticalBuffer = {
+                index: idx,
+                tags: res
+            };
+        } else {
+            res.shift(); // remove V
+            res.shift(); // remove nTags
+            let tags = arrayUnique(verticalBuffer.tags.concat(res));
+            //console.log(tags);
+            slide = {
+                type: 'V',
+                index: [idx, verticalBuffer.index],
+                tags: tags
+            };
+            verticalBuffer = null;
+            slides.push(slide);
         }
     });
 
-    let score = computeInterest(maxSlides);
+    // slides = slides.filter((x)=>{
+    //     return x.tags.length > 1;
+    // });
+
+    slides.sort((s1, s2) => {
+        return s1.tags.length > s2.tags.length;
+    });
+
+    let score = computeInterest(slides);
     console.log(`maxScore: ${score}`);
 
     totalScore += score;
-    let output = `${maxSlides.length}\n`;
-    maxSlides.forEach(slide => {
+    let output = `${slides.length}\n`;
+    slides.forEach(slide => {
         if (slide.index.length == 1) {
             output += `${slide.index[0]}\n`;
         } else {
