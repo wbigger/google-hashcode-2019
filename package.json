@@ -1,0 +1,18 @@
+{
+  "name": "my-team",
+  "version": "1.0.0",
+  "description": "Hashcode 2019",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "hashcode",
+    "google"
+  ],
+  "author": "Claudio Capobianco",
+  "license": "GPL-3.0-or-later",
+  "dependencies": {
+    "seedrandom": "^2.4.4"
+  }
+}
