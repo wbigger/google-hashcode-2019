@@ -21,3 +21,9 @@ While running, the javascript file will print on console the score for each data
 Now... happy coding :)
 
 
+## Notes
+This project makes the hypothesis that you optimize the problem in two ways:
+- first: pair photos with vertical orientation in a single slide
+- second: order all the slide in the slideshow 
+
+If you have more complex optimization algorithm, you can find the project useful anyway but you may have to restructure the code.
