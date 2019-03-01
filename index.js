@@ -14,7 +14,7 @@ function arrayUnique(array) {
     return a;
 }
 
-//let filenames = ["a_example"];
+// let filenames = ["a_example"];
 
 let filenames = ["a_example",
     "b_lovely_landscapes",
@@ -56,77 +56,67 @@ filenames.forEach(filename => {
     lines.shift(); // remove index
     lines.pop(); // remove last empty line
     //console.log(lines);
-    let slides = [];
-    let verticalBuffer = null;
+    let slideShow = [];
 
-    // vLines = lines.filter((x)=>{
-    //     return line.split(" ")[0] === 'V';
-    // }).sort((a,b)=>{
-
-    // });
-
-
-    // remove images with a single line
-    // lines = lines.filter((line) => {
-    //     return line.split(" ")[1] > 0;
-    // });
-
-
-    lines.forEach((line, idx) => {
-        res = line.split(" ");
-
-
-        let slide = null;
-        if (res[0] == 'H') {
-            res.shift(); // remove H
-            res.shift(); // remove nTags
-            slide = {
-                type: 'H',
-                index: [idx],
-                tags: res
-            };
-            //console.log(slide.tags);
-            slides.push(slide);
-        } else if (verticalBuffer == null) {
-            res.shift(); // remove V
-            res.shift(); // remove nTags
-            verticalBuffer = {
-                index: idx,
-                tags: res
-            };
-        } else {
-            res.shift(); // remove V
-            res.shift(); // remove nTags
-            let tags = arrayUnique(verticalBuffer.tags.concat(res));
-            //console.log(tags);
-            slide = {
-                type: 'V',
-                index: [idx, verticalBuffer.index],
-                tags: tags
-            };
-            verticalBuffer = null;
-            slides.push(slide);
+    // convert lines text to object
+    let photos = lines = lines.map((line, idx) => {
+        let res = line.split(" ");
+        return {
+            index: idx,
+            type: res[0],
+            nTags: res[1],
+            tags: res.slice(2)
         }
     });
 
-    // slides = slides.filter((x)=>{
-    //     return x.tags.length > 1;
-    // });
+    // horizontal lines
+    photos.filter((photo) => {
+        return photo.type === 'H';
+    }).forEach((photo) => {
+        //console.log(photo);
+        // push the photo in the slideshow
+        let slide = {
+            //type: 'H',// do we need this info?
+            indexArray: [photo.index],
+            tags: photo.tags
+        };
+        slideShow.push(slide);
+    });
 
-    slides.sort((s1, s2) => {
+    // vertical lines
+    let verticalBuffer = null;
+    photos.filter((photo) => {
+        return photo.type === 'V';
+    }).forEach((photo) => {
+        if (verticalBuffer == null) {
+            verticalBuffer = photo;
+        } else {
+            let tags = arrayUnique(verticalBuffer.tags.concat(photo.tags));
+            //console.log(tags);
+            let slide = {
+                // type: 'V', // do we need this info?
+                indexArray: [photo.index, verticalBuffer.index],
+                tags: tags
+            };
+            verticalBuffer = null;
+            slideShow.push(slide);
+        }
+    });;
+
+    slideShow.sort((s1, s2) => {
         return s1.tags.length > s2.tags.length;
     });
 
-    let score = computeInterest(slides);
-    console.log(`maxScore: ${score}`);
+    let score = computeInterest(slideShow);
+    console.log(`score: ${score}\n`);
 
     totalScore += score;
-    let output = `${slides.length}\n`;
-    slides.forEach(slide => {
-        if (slide.index.length == 1) {
-            output += `${slide.index[0]}\n`;
+    let output = `${slideShow.length}\n`;
+    slideShow.forEach(slide => {
+        if (slide.indexArray.length == 1) {
+            output += `${slide.indexArray[0]}\n`;
         } else {
-            output += `${slide.index[0]} ${slide.index[1]}\n`;
+            output += `${slide.indexArray[0]} ${slide.indexArray[1]}\n`;
         }
     });
 
