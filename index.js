@@ -32,11 +32,11 @@ function computeInterest(slides) {
             return;
         }
         s2 = slide;
-        let i1 = s1.tags.filter(x => s2.tags.includes(x)).length; // intersezione
+        let i1 = s1.tags.filter(x => s2.tags.includes(x)).length; // intersection
         //console.log(`interest 1: ${i1}`);
-        let i2 = s1.tags.filter(x => !s2.tags.includes(x)).length; // differenza
+        let i2 = s1.tags.filter(x => !s2.tags.includes(x)).length; // difference
         //console.log(`interest 2: ${i2}`);
-        let i3 = s2.tags.filter(x => !s1.tags.includes(x)).length;  // differenza
+        let i3 = s2.tags.filter(x => !s1.tags.includes(x)).length;  // difference
         //console.log(`interest 3: ${i3}`);
         let min = Math.min(i1, i2, i3);
 
@@ -61,7 +61,7 @@ filenames.forEach(filename => {
     // convert lines text to object
     let photos = lines.map((line, idx) => {
         let res = line.split(" ");
-        let tags = res.slice(2);
+        let tags = res.slice(2); // remove orientation and number of tags
         //console.log(tags);
         return {
             index: idx,
@@ -78,7 +78,6 @@ filenames.forEach(filename => {
         //console.log(photo);
         // push the photo in the slideshow
         let slide = {
-            //type: 'H',// do we need this info?
             indexArray: [photo.index],
             tags: photo.tags
         };
@@ -86,32 +85,33 @@ filenames.forEach(filename => {
     });
 
     // vertical lines
-    let verticalBuffer = null;
+    let vPhotoBuffer = null;
     photos.filter((photo) => {
         return photo.type === 'V';
     }).forEach((photo) => {
-        if (verticalBuffer == null) {
-            verticalBuffer = photo;
+        // TODO: put here your logic to join together vertical photos
+        if (vPhotoBuffer == null) {
+            vPhotoBuffer = photo;
         } else {
-            let tags = arrayUnique(verticalBuffer.tags.concat(photo.tags));
+            let tags = arrayUnique(vPhotoBuffer.tags.concat(photo.tags));
             let slide = {
-                // type: 'V', // do we need this info?
-                indexArray: [photo.index, verticalBuffer.index],
+                indexArray: [photo.index, vPhotoBuffer.index],
                 tags: tags
             };
             slideShow.push(slide);
-            verticalBuffer = null;
+            vPhotoBuffer = null;
         }
     });
 
+    // TODO: put here your logic to sort slides
     slideShow.sort((s1, s2) => {
         return s1.tags.length > s2.tags.length;
     });
 
     let score = computeInterest(slideShow);
     console.log(`score: ${score}\n`);
-
     totalScore += score;
+    
     let output = `${slideShow.length}\n`;
     let outputDebug = '';
     slideShow.forEach(slide => {
@@ -124,18 +124,20 @@ filenames.forEach(filename => {
         }
     });
 
-
+    // create file for submission
     fs.writeFile(`${filename}_out.txt`, output, function (err) {
         if (err) throw err;
         console.log(`Saved ${filename}_out.txt!`);
     });
 
+    // create an handy file for debug
     fs.writeFile(`${filename}_debug.txt`, outputDebug, function (err) {
         if (err) throw err;
         console.log(`Saved ${filename}_debug.txt!`);
     });
 });
 
-console.log(`Total Score is... ${totalScore}!`);
+console.log(`--> Total Score is... ${totalScore}! <--\n`);
+
 
 
