@@ -59,13 +59,15 @@ filenames.forEach(filename => {
     let slideShow = [];
 
     // convert lines text to object
-    let photos = lines = lines.map((line, idx) => {
+    let photos = lines.map((line, idx) => {
         let res = line.split(" ");
+        let tags = res.slice(2);
+        //console.log(tags);
         return {
             index: idx,
             type: res[0],
             nTags: res[1],
-            tags: res.slice(2)
+            tags: tags
         }
     });
 
@@ -92,16 +94,15 @@ filenames.forEach(filename => {
             verticalBuffer = photo;
         } else {
             let tags = arrayUnique(verticalBuffer.tags.concat(photo.tags));
-            //console.log(tags);
             let slide = {
                 // type: 'V', // do we need this info?
                 indexArray: [photo.index, verticalBuffer.index],
                 tags: tags
             };
-            verticalBuffer = null;
             slideShow.push(slide);
+            verticalBuffer = null;
         }
-    });;
+    });
 
     slideShow.sort((s1, s2) => {
         return s1.tags.length > s2.tags.length;
@@ -112,11 +113,14 @@ filenames.forEach(filename => {
 
     totalScore += score;
     let output = `${slideShow.length}\n`;
+    let outputDebug = '';
     slideShow.forEach(slide => {
         if (slide.indexArray.length == 1) {
             output += `${slide.indexArray[0]}\n`;
+            outputDebug += `${slide.indexArray[0]} ${slide.tags}\n`;
         } else {
             output += `${slide.indexArray[0]} ${slide.indexArray[1]}\n`;
+            outputDebug += `${slide.indexArray[0]} ${slide.indexArray[1]} ${slide.tags}\n`;
         }
     });
 
@@ -124,6 +128,11 @@ filenames.forEach(filename => {
     fs.writeFile(`${filename}_out.txt`, output, function (err) {
         if (err) throw err;
         console.log(`Saved ${filename}_out.txt!`);
+    });
+
+    fs.writeFile(`${filename}_debug.txt`, outputDebug, function (err) {
+        if (err) throw err;
+        console.log(`Saved ${filename}_debug.txt!`);
     });
 });
 

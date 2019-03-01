@@ -1,0 +1,3 @@
+3 garden,cat
+0 cat,beach,sun
+2 1 selfie,smile,garden
