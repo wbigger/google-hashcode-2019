@@ -133,7 +133,7 @@ filenames.forEach(filename => {
 
     fs.writeFile(`${filename}_out.txt`, output, function (err) {
         if (err) throw err;
-        console.log('Saved!');
+        console.log(`Saved ${filename}_out.txt!`);
     });
 });
 
