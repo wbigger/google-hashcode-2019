@@ -90,6 +90,7 @@ filenames.forEach(filename => {
         return photo.type === 'V';
     }).forEach((photo) => {
         // TODO: put here your logic to join together vertical photos
+        // Now just join the vertical photos simply according to dataset order
         if (vPhotoBuffer == null) {
             vPhotoBuffer = photo;
         } else {
@@ -104,6 +105,7 @@ filenames.forEach(filename => {
     });
 
     // TODO: put here your logic to sort slides
+    // Sort lines according to the number of tags
     slideShow.sort((s1, s2) => {
         return s1.tags.length > s2.tags.length;
     });
