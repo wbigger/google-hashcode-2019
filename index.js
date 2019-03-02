@@ -51,7 +51,7 @@ function computeInterest(slides) {
 
 filenames.forEach(filename => {
     console.log(filename);
-    let contents = fs.readFileSync(`${filename}.txt`, 'ASCII');
+    let contents = fs.readFileSync(`dataset/${filename}.txt`, 'ASCII');
     let lines = contents.split('\n');
     lines.shift(); // remove index
     lines.pop(); // remove last empty line
@@ -125,13 +125,13 @@ filenames.forEach(filename => {
     });
 
     // create file for submission
-    fs.writeFile(`${filename}_out.txt`, output, function (err) {
+    fs.writeFile(`submit/${filename}_out.txt`, output, function (err) {
         if (err) throw err;
         console.log(`Saved ${filename}_out.txt!`);
     });
 
     // create an handy file for debug
-    fs.writeFile(`${filename}_debug.txt`, outputDebug, function (err) {
+    fs.writeFile(`debug/${filename}_debug.txt`, outputDebug, function (err) {
         if (err) throw err;
         console.log(`Saved ${filename}_debug.txt!`);
     });
